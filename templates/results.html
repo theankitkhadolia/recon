@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Scan Results</h2>
+    <div>
+        <a href="/history" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        <div class="btn-group ms-2">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-download"></i> Download
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="/download_results/{{ scan.id }}/json" target="_blank">
+                        <i class="fas fa-file-code"></i> JSON
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="/download_results/{{ scan.id }}/csv" target="_blank">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark">
+        <h5 class="mb-0 text-white">Scan Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Target</dt>
+                    <dd class="col-sm-8">{{ scan.target }}</dd>
+                    
+                    <dt class="col-sm-4">Scan ID</dt>
+                    <dd class="col-sm-8">{{ scan.id }}</dd>
+                    
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        {% if scan.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% elif scan.status == 'running' %}
+                            <span class="badge bg-primary">Running</span>
+                        {% elif scan.status == 'failed' %}
+                            <span class="badge bg-danger">Failed</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ scan.status }}</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Start Time</dt>
+                    <dd class="col-sm-8">{{ scan.start_time.strftime('%Y-%m-%d %H:%M:%S UTC') if scan.start_time else 'N/A' }}</dd>
+                    
+                    <dt class="col-sm-4">End Time</dt>
+                    <dd class="col-sm-8">{{ scan.end_time.strftime('%Y-%m-%d %H:%M:%S UTC') if scan.end_time else 'N/A' }}</dd>
+                    
+                    <dt class="col-sm-4">Duration</dt>
+                    <dd class="col-sm-8">{{ scan.formatted_duration }}</dd>
+                </dl>
+            </div>
+        </div>
+        
+        <h6 class="mt-3">Tools Used</h6>
+        <div class="mb-2">
+            {% for tool in scan.tools_list %}
+                <span class="badge bg-info me-1">{{ tool }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Results Tab Navigation -->
+<ul class="nav nav-tabs mb-3" id="resultsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="subdomains-tab" data-bs-toggle="tab" data-bs-target="#subdomains" type="button" role="tab" aria-controls="subdomains" aria-selected="true">
+            <i class="fas fa-sitemap"></i> Subdomains
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ports-tab" data-bs-toggle="tab" data-bs-target="#ports" type="button" role="tab" aria-controls="ports" aria-selected="false">
+            <i class="fas fa-network-wired"></i> Ports
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="urls-tab" data-bs-toggle="tab" data-bs-target="#urls" type="button" role="tab" aria-controls="urls" aria-selected="false">
+            <i class="fas fa-link"></i> URLs
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab" aria-controls="other" aria-selected="false">
+            <i class="fas fa-clipboard-list"></i> Other Findings
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="errors-tab" data-bs-toggle="tab" data-bs-target="#errors" type="button" role="tab" aria-controls="errors" aria-selected="false">
+            <i class="fas fa-exclamation-triangle"></i> Errors
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="resultsTabContent">
+    <!-- Subdomains Tab -->
+    <div class="tab-pane fade show active" id="subdomains" role="tabpanel" aria-labelledby="subdomains-tab">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-sitemap"></i> Discovered Subdomains</h5>
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="subdomainSearch" placeholder="Filter subdomains...">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subdomain</th>
+                                <th>Source Tool</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subdomainsTable">
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading subdomain data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="subdomainsPagination" class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span id="subdomainsCount" class="text-muted">0 subdomains found</span>
+                    </div>
+                    <nav aria-label="Subdomains pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Pagination will be added by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ports Tab -->
+    <div class="tab-pane fade" id="ports" role="tabpanel" aria-labelledby="ports-tab">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-network-wired"></i> Open Ports & Services</h5>
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="portsSearch" placeholder="Filter ports...">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>Port</th>
+                                <th>Protocol</th>
+                                <th>Service</th>
+                                <th>Version</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portsTable">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading port data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="portsPagination" class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span id="portsCount" class="text-muted">0 ports found</span>
+                    </div>
+                    <nav aria-label="Ports pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Pagination will be added by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- URLs Tab -->
+    <div class="tab-pane fade" id="urls" role="tabpanel" aria-labelledby="urls-tab">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-link"></i> Discovered URLs</h5>
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="urlsSearch" placeholder="Filter URLs...">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Source Tool</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="urlsTable">
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading URL data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="urlsPagination" class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span id="urlsCount" class="text-muted">0 URLs found</span>
+                    </div>
+                    <nav aria-label="URLs pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Pagination will be added by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Other Findings Tab -->
+    <div class="tab-pane fade" id="other" role="tabpanel" aria-labelledby="other-tab">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-clipboard-list"></i> Other Findings</h5>
+                <div id="otherFindings">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading other findings...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Errors Tab -->
+    <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-exclamation-triangle"></i> Errors</h5>
+                <div id="errorsList">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading error data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden scan data for JavaScript -->
+<div id="scanData" data-scan-id="{{ scan.id }}" data-target="{{ scan.target }}" style="display: none;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}
