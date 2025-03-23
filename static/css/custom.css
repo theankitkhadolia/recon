@@ -1,0 +1,113 @@
+/* Additional custom styles to complement Bootstrap */
+
+/* Sticky footer styles */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 80px; /* Margin bottom by footer height */
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Fixed height of footer */
+}
+
+/* Custom card styles */
+.card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.175);
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  border-bottom: none;
+  padding: 1rem 1.25rem;
+}
+
+/* Table adjustments for results */
+.table th {
+  border-top: none;
+  font-weight: 600;
+}
+
+/* Progress bar styling */
+.progress {
+  height: 1.25rem;
+  border-radius: 0.25rem;
+}
+
+/* Tab navigation styling */
+.nav-tabs .nav-link {
+  border: none;
+  color: var(--bs-secondary);
+  padding: 0.75rem 1rem;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--bs-primary);
+  border: none;
+}
+
+.nav-tabs .nav-link.active {
+  font-weight: 600;
+  color: var(--bs-primary);
+  background-color: transparent;
+  border-bottom: 2px solid var(--bs-primary);
+}
+
+/* Long text truncation */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 500px;
+}
+
+/* Fix for modals on dark backgrounds */
+.modal-content {
+  background-color: var(--bs-dark);
+  color: var(--bs-light);
+}
+
+/* Tool checkboxes style */
+.form-check {
+  margin-bottom: 0.7rem;
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+/* Badge override */
+.badge {
+  font-weight: normal;
+  padding: 0.35em 0.65em;
+}
+
+/* Fix for accordion in dark theme */
+.accordion-button:not(.collapsed) {
+  color: var(--bs-white);
+  background-color: var(--bs-primary);
+}
+
+/* Fix for pagination in dark theme */
+.page-link {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-gray-700);
+}
+
+.page-item.active .page-link {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-gray-700);
+}
