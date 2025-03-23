@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-history"></i> Scan History</h2>
+    <a href="/" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> New Scan
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if scans %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Target</th>
+                            <th>Status</th>
+                            <th>Tools</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for scan in scans %}
+                            <tr>
+                                <td>{{ scan.target }}</td>
+                                <td>
+                                    {% if scan.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif scan.status == 'running' %}
+                                        <span class="badge bg-primary">Running ({{ scan.progress }}%)</span>
+                                    {% elif scan.status == 'failed' %}
+                                        <span class="badge bg-danger">Failed</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ scan.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for tool in scan.tools_list %}
+                                            <span class="badge bg-info">{{ tool }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td>{{ scan.start_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>{{ scan.formatted_duration }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/results/{{ scan.id }}" class="btn btn-outline-primary" title="View Results">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="/download_results/{{ scan.id }}/json" target="_blank">
+                                                        <i class="fas fa-file-code"></i> JSON
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="/download_results/{{ scan.id }}/csv" target="_blank">
+                                                        <i class="fas fa-file-csv"></i> CSV
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h5>No scans found</h5>
+                <p class="text-muted">Start a new scan from the home page</p>
+                <a href="/" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle"></i> Start New Scan
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
