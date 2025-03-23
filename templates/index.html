@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-search"></i> Start Reconnaissance</h3>
+            </div>
+            <div class="card-body">
+                <form id="scanForm">
+                    <div class="mb-3">
+                        <label for="target" class="form-label">Target Domain/IP</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                            <input type="text" class="form-control" id="target" name="target" placeholder="example.com or 192.168.1.1" required>
+                        </div>
+                        <div class="form-text">Enter a valid domain name or IP address</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Select Tools</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="nmap" id="nmap" checked>
+                                    <label class="form-check-label" for="nmap">
+                                        <i class="fas fa-network-wired"></i> Nmap
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="amass" id="amass">
+                                    <label class="form-check-label" for="amass">
+                                        <i class="fas fa-sitemap"></i> Amass
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="sublist3r" id="sublist3r">
+                                    <label class="form-check-label" for="sublist3r">
+                                        <i class="fas fa-list"></i> Sublist3r
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="assetfinder" id="assetfinder">
+                                    <label class="form-check-label" for="assetfinder">
+                                        <i class="fas fa-search"></i> Assetfinder
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="gau" id="gau">
+                                    <label class="form-check-label" for="gau">
+                                        <i class="fas fa-link"></i> GetAllURLs (GAU)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="crt" id="crt">
+                                    <label class="form-check-label" for="crt">
+                                        <i class="fas fa-certificate"></i> Certificate Transparency Logs (CRT)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="subfinder" id="subfinder">
+                                    <label class="form-check-label" for="subfinder">
+                                        <i class="fas fa-binoculars"></i> Subfinder
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="shuffledns" id="shuffledns">
+                                    <label class="form-check-label" for="shuffledns">
+                                        <i class="fas fa-random"></i> ShuffleDNS
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="gospider" id="gospider">
+                                    <label class="form-check-label" for="gospider">
+                                        <i class="fas fa-spider"></i> GoSpider
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="subdomainizer" id="subdomainizer">
+                                    <label class="form-check-label" for="subdomainizer">
+                                        <i class="fas fa-code-branch"></i> Subdomainizer
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="startScanBtn">
+                            <i class="fas fa-play-circle"></i> Start Scan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scan Progress Modal -->
+<div class="modal fade" id="scanProgressModal" tabindex="-1" aria-labelledby="scanProgressModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scanProgressModalLabel">Scan in Progress</h5>
+            </div>
+            <div class="modal-body">
+                <p>Target: <span id="modalTarget" class="fw-bold"></span></p>
+                <div class="progress mb-3">
+                    <div id="scanProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div id="scanStatus">
+                    <p class="text-center text-info">
+                        <i class="fas fa-spinner fa-spin"></i> Initializing scan...
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="viewResultsBtn" style="display: none;">
+                    <i class="fas fa-eye"></i> View Results
+                </button>
+                <button type="button" class="btn btn-primary" id="startNewBtn" style="display: none;">
+                    <i class="fas fa-plus-circle"></i> Start New Scan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
