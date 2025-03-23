@@ -3,7 +3,7 @@ import logging
 import json
 import datetime
 import time
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 from utils import ToolExecutor
 from app import db
 from models import Scan, ScanResult
